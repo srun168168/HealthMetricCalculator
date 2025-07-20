@@ -41,11 +41,11 @@ export default function BMICalculator() {
   const form = useForm<BMIFormData>({
     resolver: zodResolver(bmiSchema),
     defaultValues: {
-      age: undefined,
-      weight: undefined,
-      heightCm: undefined,
-      heightFeet: undefined,
-      heightInches: undefined,
+      age: '' as any,
+      weight: '' as any,
+      heightCm: '' as any,
+      heightFeet: '' as any,
+      heightInches: '' as any,
     },
   });
 
@@ -117,15 +117,15 @@ export default function BMICalculator() {
   const toggleHeightUnit = (unit: 'metric' | 'imperial') => {
     setHeightUnit(unit);
     // Clear height fields when switching units
-    form.setValue('heightCm', undefined);
-    form.setValue('heightFeet', undefined);
-    form.setValue('heightInches', undefined);
+    form.setValue('heightCm', '' as any);
+    form.setValue('heightFeet', '' as any);
+    form.setValue('heightInches', '' as any);
   };
 
   const toggleWeightUnit = (unit: 'metric' | 'imperial') => {
     setWeightUnit(unit);
     // Clear weight field when switching units
-    form.setValue('weight', undefined);
+    form.setValue('weight', '' as any);
   };
 
   return (
@@ -392,7 +392,7 @@ export default function BMICalculator() {
                     </div>
                     <div className="flex items-center justify-between p-3 bg-red-100 text-red-800 rounded-lg">
                       <span className="font-medium">Obese</span>
-                      <span>&geq; 30.0</span>
+                      <span>≥ 30.0</span>
                     </div>
                   </div>
                 </div>
