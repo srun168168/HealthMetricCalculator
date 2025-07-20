@@ -12,16 +12,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import type { BmiRecord, InsertBmiRecord } from "@shared/schema";
 
-const bmiSchema = z.object({
+const bmiFormSchema = z.object({
   name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  age: z.coerce.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
-  weight: z.coerce.number().min(1, "Weight must be greater than 0").max(1000, "Weight must be less than 1000"),
-  heightCm: z.coerce.number().min(30, "Height must be at least 30cm").max(300, "Height must be less than 300cm").optional(),
-  heightFeet: z.coerce.number().min(1, "Height must be at least 1 foot").max(9, "Height must be less than 9 feet").optional(),
-  heightInches: z.coerce.number().min(0, "Inches must be 0 or more").max(11, "Inches must be less than 12").optional(),
+  age: z.string().min(1, "Age is required"),
+  weight: z.string().min(1, "Weight is required"),
+  heightCm: z.string().optional(),
+  heightFeet: z.string().optional(),
+  heightInches: z.string().optional(),
 }).refine(
   (data) => {
-    return data.heightCm || (data.heightFeet && data.heightInches !== undefined);
+    return data.heightCm || (data.heightFeet && data.heightInches);
   },
   {
     message: "Please enter a valid height",
@@ -29,7 +29,7 @@ const bmiSchema = z.object({
   }
 );
 
-type BMIFormData = z.infer<typeof bmiSchema>;
+type BMIFormData = z.infer<typeof bmiFormSchema>;
 
 interface BMIResult {
   bmi: number;
@@ -79,7 +79,7 @@ export default function BMICalculator() {
   });
 
   const form = useForm<BMIFormData>({
-    resolver: zodResolver(bmiSchema),
+    resolver: zodResolver(bmiFormSchema),
     defaultValues: {
       name: '',
       age: '',
@@ -96,17 +96,17 @@ export default function BMICalculator() {
 
     // Convert height to meters
     if (heightUnit === 'metric') {
-      heightInMeters = (data.heightCm || 0) / 100;
+      heightInMeters = (parseFloat(data.heightCm || '0')) / 100;
     } else {
-      const totalInches = (data.heightFeet || 0) * 12 + (data.heightInches || 0);
+      const totalInches = (parseFloat(data.heightFeet || '0')) * 12 + (parseFloat(data.heightInches || '0'));
       heightInMeters = totalInches * 0.0254;
     }
 
     // Convert weight to kg
     if (weightUnit === 'metric') {
-      weightInKg = data.weight;
+      weightInKg = parseFloat(data.weight);
     } else {
-      weightInKg = data.weight * 0.453592; // pounds to kg
+      weightInKg = parseFloat(data.weight) * 0.453592; // pounds to kg
     }
 
     const bmi = weightInKg / (heightInMeters * heightInMeters);
@@ -156,23 +156,23 @@ export default function BMICalculator() {
     
     // Convert height to centimeters for storage
     if (heightUnit === 'metric') {
-      heightInCm = formData.heightCm || 0;
+      heightInCm = parseFloat(formData.heightCm || '0');
     } else {
-      const totalInches = (formData.heightFeet || 0) * 12 + (formData.heightInches || 0);
+      const totalInches = (parseFloat(formData.heightFeet || '0')) * 12 + (parseFloat(formData.heightInches || '0'));
       heightInCm = totalInches * 2.54;
     }
     
     let weightInKg: number;
     if (weightUnit === 'metric') {
-      weightInKg = formData.weight;
+      weightInKg = parseFloat(formData.weight);
     } else {
-      weightInKg = formData.weight * 0.453592;
+      weightInKg = parseFloat(formData.weight) * 0.453592;
     }
     
     const record: InsertBmiRecord = {
       userId: null, // For now, we'll allow anonymous records
       name: formData.name,
-      age: formData.age,
+      age: parseInt(formData.age),
       weight: weightInKg,
       height: heightInCm,
       bmi: result.bmi,
