@@ -23,6 +23,16 @@
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(20, 14.3%, 4.1%);
   --radius: 0.5rem;
+  
+  /* BMI Category Colors - Light Theme */
+  --bmi-underweight: hsl(210, 100%, 90%);
+  --bmi-underweight-text: hsl(210, 100%, 25%);
+  --bmi-normal: hsl(142, 76%, 88%);
+  --bmi-normal-text: hsl(142, 76%, 20%);
+  --bmi-overweight: hsl(48, 96%, 89%);
+  --bmi-overweight-text: hsl(48, 96%, 25%);
+  --bmi-obese: hsl(0, 84%, 90%);
+  --bmi-obese-text: hsl(0, 84%, 25%);
 }
 
 .dark {
@@ -46,6 +56,16 @@
   --destructive-foreground: hsl(0, 0%, 98%);
   --ring: hsl(240, 4.9%, 83.9%);
   --radius: 0.5rem;
+  
+  /* BMI Category Colors - Dark Theme */
+  --bmi-underweight: hsl(210, 50%, 15%);
+  --bmi-underweight-text: hsl(210, 100%, 70%);
+  --bmi-normal: hsl(142, 40%, 15%);
+  --bmi-normal-text: hsl(142, 76%, 70%);
+  --bmi-overweight: hsl(48, 50%, 15%);
+  --bmi-overweight-text: hsl(48, 96%, 70%);
+  --bmi-obese: hsl(0, 40%, 15%);
+  --bmi-obese-text: hsl(0, 84%, 70%);
 }
 
 @layer base {
@@ -62,14 +82,20 @@
 /* Custom styling for BMI Calculator */
 @layer components {
   .bmi-calculator {
-    background-color: hsl(210, 40%, 98%);
+    background-color: var(--background);
   }
   
   .bmi-card {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    background-color: var(--card);
+    border: 1px solid var(--border);
   }
   
   .bmi-gradient {
-    background: linear-gradient(135deg, hsl(207, 90%, 97%) 0%, hsl(213, 90%, 95%) 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--muted) 100%);
+  }
+  
+  .dark .bmi-card {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
   }
 }

@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Calculator, RotateCcw, Heart, CheckCircle, Info, Save, History } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/theme-toggle";
 import type { BmiRecord, InsertBmiRecord } from "@shared/schema";
 
 const bmiFormSchema = z.object({
@@ -211,19 +212,24 @@ export default function BMICalculator() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-8 px-4">
+    <div className="bg-background min-h-screen py-8 px-4">
       <div className="max-w-2xl mx-auto">
+        {/* Theme Toggle */}
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+        
         {/* Header Section */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <Calculator className="w-8 h-8 text-blue-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+            <Calculator className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">BMI Calculator</h1>
-          <p className="text-gray-600">Calculate your Body Mass Index and get health insights</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">BMI Calculator</h1>
+          <p className="text-muted-foreground">Calculate your Body Mass Index and get health insights</p>
         </div>
 
         {/* Main Calculator Card */}
-        <Card className="bg-white rounded-xl shadow-lg mb-6">
+        <Card className="bg-card rounded-xl shadow-lg mb-6 border">
           <CardContent className="p-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -233,7 +239,7 @@ export default function BMICalculator() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Name</FormLabel>
+                      <FormLabel className="text-sm font-semibold text-foreground">Name</FormLabel>
                       <FormControl>
                         <Input
                           type="text"
@@ -252,7 +258,7 @@ export default function BMICalculator() {
                   name="age"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-semibold text-gray-700">Age</FormLabel>
+                      <FormLabel className="text-sm font-semibold text-foreground">Age</FormLabel>
                       <div className="relative">
                         <FormControl>
                           <Input
@@ -262,7 +268,7 @@ export default function BMICalculator() {
                             {...field}
                           />
                         </FormControl>
-                        <span className="absolute right-4 top-3 text-gray-400 text-sm">years</span>
+                        <span className="absolute right-4 top-3 text-muted-foreground text-sm">years</span>
                       </div>
                       <FormMessage />
                     </FormItem>
@@ -271,17 +277,17 @@ export default function BMICalculator() {
 
                 {/* Height Input Section */}
                 <div className="space-y-4">
-                  <Label className="block text-sm font-semibold text-gray-700">Height</Label>
+                  <Label className="block text-sm font-semibold text-foreground">Height</Label>
                   
                   {/* Unit Toggle for Height */}
-                  <div className="flex bg-gray-100 rounded-lg p-1">
+                  <div className="flex bg-muted rounded-lg p-1">
                     <button
                       type="button"
                       onClick={() => toggleHeightUnit('metric')}
-                      className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                        heightUnit === 'metric'
-                          ? 'bg-blue-500 text-white'
-                          : 'text-gray-700 hover:text-gray-900'
+                                              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                          heightUnit === 'metric'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       Centimeters
@@ -289,10 +295,10 @@ export default function BMICalculator() {
                     <button
                       type="button"
                       onClick={() => toggleHeightUnit('imperial')}
-                      className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                        heightUnit === 'imperial'
-                          ? 'bg-blue-500 text-white'
-                          : 'text-gray-700 hover:text-gray-900'
+                                              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                          heightUnit === 'imperial'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       Feet & Inches
@@ -316,7 +322,7 @@ export default function BMICalculator() {
                                 {...field}
                               />
                             </FormControl>
-                            <span className="absolute right-4 top-3 text-gray-400 text-sm">cm</span>
+                            <span className="absolute right-4 top-3 text-muted-foreground text-sm">cm</span>
                           </div>
                           <FormMessage />
                         </FormItem>
@@ -341,7 +347,7 @@ export default function BMICalculator() {
                                   {...field}
                                 />
                               </FormControl>
-                              <span className="absolute right-4 top-3 text-gray-400 text-sm">ft</span>
+                                                              <span className="absolute right-4 top-3 text-muted-foreground text-sm">ft</span>
                             </div>
                             <FormMessage />
                           </FormItem>
@@ -361,7 +367,7 @@ export default function BMICalculator() {
                                   {...field}
                                 />
                               </FormControl>
-                              <span className="absolute right-4 top-3 text-gray-400 text-sm">in</span>
+                                                              <span className="absolute right-4 top-3 text-muted-foreground text-sm">in</span>
                             </div>
                             <FormMessage />
                           </FormItem>
@@ -373,17 +379,17 @@ export default function BMICalculator() {
 
                 {/* Weight Input Section */}
                 <div className="space-y-4">
-                  <Label className="block text-sm font-semibold text-gray-700">Weight</Label>
+                  <Label className="block text-sm font-semibold text-foreground">Weight</Label>
                   
                   {/* Unit Toggle for Weight */}
-                  <div className="flex bg-gray-100 rounded-lg p-1">
+                  <div className="flex bg-muted rounded-lg p-1">
                     <button
                       type="button"
                       onClick={() => toggleWeightUnit('metric')}
-                      className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                        weightUnit === 'metric'
-                          ? 'bg-blue-500 text-white'
-                          : 'text-gray-700 hover:text-gray-900'
+                                              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                          weightUnit === 'metric'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       Kilograms
@@ -391,10 +397,10 @@ export default function BMICalculator() {
                     <button
                       type="button"
                       onClick={() => toggleWeightUnit('imperial')}
-                      className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
-                        weightUnit === 'imperial'
-                          ? 'bg-blue-500 text-white'
-                          : 'text-gray-700 hover:text-gray-900'
+                                              className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                          weightUnit === 'imperial'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
                       Pounds
@@ -416,7 +422,7 @@ export default function BMICalculator() {
                               {...field}
                             />
                           </FormControl>
-                          <span className="absolute right-4 top-3 text-gray-400 text-sm">
+                          <span className="absolute right-4 top-3 text-muted-foreground text-sm">
                             {weightUnit === 'metric' ? 'kg' : 'lbs'}
                           </span>
                         </div>
@@ -428,7 +434,7 @@ export default function BMICalculator() {
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                  <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">
+                  <Button type="submit" className="flex-1">
                     <Calculator className="w-4 h-4 mr-2" />
                     Calculate BMI
                   </Button>
@@ -436,7 +442,7 @@ export default function BMICalculator() {
                     type="button"
                     variant="secondary"
                     onClick={resetForm}
-                    className="sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-700"
+                    className="sm:w-auto"
                   >
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Reset
@@ -458,17 +464,17 @@ export default function BMICalculator() {
 
         {/* Results Card */}
         {result && (
-          <Card id="resultsCard" className="bg-white rounded-xl shadow-lg">
+          <Card id="resultsCard" className="bg-card rounded-xl shadow-lg border">
             <CardContent className="p-8">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Your BMI Result</h2>
+                <h2 className="text-2xl font-bold text-foreground mb-6">Your BMI Result</h2>
                 
                 {/* BMI Value Display */}
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
-                    {result.bmi}
-                  </div>
-                  <div className="text-gray-600">BMI Score</div>
+                                  <div className="bmi-gradient rounded-xl p-6 mb-6">
+                    <div className="text-4xl font-bold text-primary mb-2">
+                      {result.bmi}
+                    </div>
+                    <div className="text-muted-foreground">BMI Score</div>
                 </div>
 
                 {/* BMI Category */}
@@ -480,22 +486,22 @@ export default function BMICalculator() {
                 </div>
 
                 {/* BMI Categories Reference */}
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">BMI Categories</h3>
+                <div className="bg-muted/30 rounded-xl p-6">
+                  <h3 className="font-semibold text-foreground mb-4">BMI Categories</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center justify-between p-3 bg-blue-100 text-blue-800 rounded-lg">
+                    <div className="flex items-center justify-between p-3 rounded-lg" style={{backgroundColor: 'var(--bmi-underweight)', color: 'var(--bmi-underweight-text)'}}>
                       <span className="font-medium">Underweight</span>
                       <span>&lt; 18.5</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-green-100 text-green-800 rounded-lg">
+                    <div className="flex items-center justify-between p-3 rounded-lg" style={{backgroundColor: 'var(--bmi-normal)', color: 'var(--bmi-normal-text)'}}>
                       <span className="font-medium">Normal</span>
                       <span>18.5 - 24.9</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-yellow-100 text-yellow-800 rounded-lg">
+                    <div className="flex items-center justify-between p-3 rounded-lg" style={{backgroundColor: 'var(--bmi-overweight)', color: 'var(--bmi-overweight-text)'}}>
                       <span className="font-medium">Overweight</span>
                       <span>25.0 - 29.9</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-red-100 text-red-800 rounded-lg">
+                    <div className="flex items-center justify-between p-3 rounded-lg" style={{backgroundColor: 'var(--bmi-obese)', color: 'var(--bmi-obese-text)'}}>
                       <span className="font-medium">Obese</span>
                       <span>≥ 30.0</span>
                     </div>
@@ -507,7 +513,7 @@ export default function BMICalculator() {
                   <Button
                     onClick={saveBmiRecord}
                     disabled={saveBmiMutation.isPending}
-                    className="bg-green-600 hover:bg-green-700"
+                    className=""
                   >
                     <Save className="w-4 h-4 mr-2" />
                     {saveBmiMutation.isPending ? "Saving..." : "Save Result"}
@@ -530,67 +536,77 @@ export default function BMICalculator() {
 
         {/* BMI History Section */}
         {showHistory && (
-          <Card className="bg-white rounded-xl shadow-lg">
+          <Card className="bg-card rounded-xl shadow-lg border">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">BMI History</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-6 text-center">BMI History</h2>
               
               {recordsLoading ? (
                 <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  <p className="mt-2 text-gray-600">Loading history...</p>
+                                      <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                      <p className="mt-2 text-muted-foreground">Loading history...</p>
                 </div>
               ) : bmiRecords.length === 0 ? (
                 <div className="text-center py-8">
-                  <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">No BMI records found</p>
-                  <p className="text-sm text-gray-500 mt-1">Calculate and save your first BMI to see history</p>
+                                      <History className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No BMI records found</p>
+                    <p className="text-sm text-muted-foreground/70 mt-1">Calculate and save your first BMI to see history</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {bmiRecords.slice(0, 10).map((record: BmiRecord) => (
                     <div
                       key={record.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
+                                              className="flex items-center justify-between p-4 bg-card rounded-lg border"
                     >
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 mb-1">
-                          {record.name}
+                                                  <div className="font-medium text-foreground mb-1">
+                            {record.name}
                         </div>
                         <div className="flex items-center gap-4">
-                          <div className="text-sm text-gray-600">
-                            Age: {record.age}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Weight: {record.weight.toFixed(1)} kg
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            Height: {record.height.toFixed(0)} cm
-                          </div>
+                                                      <div className="text-sm text-muted-foreground">
+                              Age: {record.age}
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Weight: {record.weight.toFixed(1)} kg
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                              Height: {record.height.toFixed(0)} cm
+                            </div>
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-muted-foreground/70 mt-1">
                           {new Date(record.createdAt).toLocaleDateString()} at {new Date(record.createdAt).toLocaleTimeString()}
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-bold text-blue-600">
+                        <div className="text-xl font-bold text-primary">
                           {record.bmi.toFixed(1)}
                         </div>
-                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          record.category === 'Normal Weight' 
-                            ? 'bg-green-100 text-green-800'
-                            : record.category === 'Underweight'
-                            ? 'bg-blue-100 text-blue-800'
-                            : record.category === 'Overweight'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                                                  <div 
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: record.category === 'Normal Weight' 
+                                ? 'var(--bmi-normal)'
+                                : record.category === 'Underweight'
+                                ? 'var(--bmi-underweight)'
+                                : record.category === 'Overweight'
+                                ? 'var(--bmi-overweight)'
+                                : 'var(--bmi-obese)',
+                              color: record.category === 'Normal Weight' 
+                                ? 'var(--bmi-normal-text)'
+                                : record.category === 'Underweight'
+                                ? 'var(--bmi-underweight-text)'
+                                : record.category === 'Overweight'
+                                ? 'var(--bmi-overweight-text)'
+                                : 'var(--bmi-obese-text)'
+                            }}
+                          >
                           {record.category}
                         </div>
                       </div>
                     </div>
                   ))}
                   {bmiRecords.length > 10 && (
-                    <p className="text-sm text-gray-500 text-center mt-4">
+                    <p className="text-sm text-muted-foreground/70 text-center mt-4">
                       Showing recent 10 records out of {bmiRecords.length} total
                     </p>
                   )}
@@ -601,9 +617,9 @@ export default function BMICalculator() {
         )}
 
         {/* Footer Information */}
-        <div className="text-center mt-8 text-gray-600">
+        <div className="text-center mt-8 text-muted-foreground">
           <p className="text-sm">
-            <Heart className="w-4 h-4 text-red-400 mr-1 inline" />
+                          <Heart className="w-4 h-4 text-red-500 mr-1 inline" />
             BMI Calculator for health awareness and fitness tracking
           </p>
         </div>
