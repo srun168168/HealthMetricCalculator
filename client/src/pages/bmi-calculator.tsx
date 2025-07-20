@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calculator, RotateCcw, Heart, CheckCircle, Info } from "lucide-react";
+import { Calculator, RotateCcw, Heart, CheckCircle, Info, Save, History } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import type { BmiRecord, InsertBmiRecord } from "@shared/schema";
 
 const bmiSchema = z.object({
   age: z.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
@@ -37,6 +40,42 @@ export default function BMICalculator() {
   const [heightUnit, setHeightUnit] = useState<'metric' | 'imperial'>('metric');
   const [weightUnit, setWeightUnit] = useState<'metric' | 'imperial'>('metric');
   const [result, setResult] = useState<BMIResult | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  // Fetch BMI records
+  const { data: bmiRecords = [], isLoading: recordsLoading } = useQuery<BmiRecord[]>({
+    queryKey: ["/api/bmi-records"],
+  });
+  
+  // Mutation to save BMI record
+  const saveBmiMutation = useMutation({
+    mutationFn: async (record: InsertBmiRecord) => {
+      const response = await fetch("/api/bmi-records", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(record),
+      });
+      if (!response.ok) throw new Error("Failed to save BMI record");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/bmi-records"] });
+      toast({
+        title: "Success!",
+        description: "BMI calculation saved successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to save BMI record",
+        variant: "destructive",
+      });
+    },
+  });
 
   const form = useForm<BMIFormData>({
     resolver: zodResolver(bmiSchema),
@@ -105,6 +144,39 @@ export default function BMICalculator() {
         resultsElement.scrollIntoView({ behavior: 'smooth' });
       }
     }, 100);
+  };
+  
+  const saveBmiRecord = async () => {
+    if (!result) return;
+    
+    const formData = form.getValues();
+    let heightInCm: number;
+    
+    // Convert height to centimeters for storage
+    if (heightUnit === 'metric') {
+      heightInCm = formData.heightCm || 0;
+    } else {
+      const totalInches = (formData.heightFeet || 0) * 12 + (formData.heightInches || 0);
+      heightInCm = totalInches * 2.54;
+    }
+    
+    let weightInKg: number;
+    if (weightUnit === 'metric') {
+      weightInKg = formData.weight;
+    } else {
+      weightInKg = formData.weight * 0.453592;
+    }
+    
+    const record: InsertBmiRecord = {
+      userId: null, // For now, we'll allow anonymous records
+      age: formData.age,
+      weight: weightInKg,
+      height: heightInCm,
+      bmi: result.bmi,
+      category: result.category,
+    };
+    
+    saveBmiMutation.mutate(record);
   };
 
   const resetForm = () => {
@@ -345,6 +417,15 @@ export default function BMICalculator() {
                     <RotateCcw className="w-4 h-4 mr-2" />
                     Reset
                   </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowHistory(!showHistory)}
+                    className="sm:w-auto"
+                  >
+                    <History className="w-4 h-4 mr-2" />
+                    {showHistory ? 'Hide' : 'Show'} History
+                  </Button>
                 </div>
               </form>
             </Form>
@@ -397,6 +478,18 @@ export default function BMICalculator() {
                   </div>
                 </div>
 
+                {/* Save Button */}
+                <div className="mt-6 text-center">
+                  <Button
+                    onClick={saveBmiRecord}
+                    disabled={saveBmiMutation.isPending}
+                    className="bg-green-600 hover:bg-green-700"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {saveBmiMutation.isPending ? "Saving..." : "Save Result"}
+                  </Button>
+                </div>
+
                 {/* Health Note */}
                 <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                   <div className="flex items-start">
@@ -407,6 +500,75 @@ export default function BMICalculator() {
                   </div>
                 </div>
               </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* BMI History Section */}
+        {showHistory && (
+          <Card className="bg-white rounded-xl shadow-lg">
+            <CardContent className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">BMI History</h2>
+              
+              {recordsLoading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  <p className="mt-2 text-gray-600">Loading history...</p>
+                </div>
+              ) : bmiRecords.length === 0 ? (
+                <div className="text-center py-8">
+                  <History className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No BMI records found</p>
+                  <p className="text-sm text-gray-500 mt-1">Calculate and save your first BMI to see history</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {bmiRecords.slice(0, 10).map((record: BmiRecord) => (
+                    <div
+                      key={record.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4">
+                          <div className="text-sm text-gray-600">
+                            Age: {record.age}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Weight: {record.weight.toFixed(1)} kg
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            Height: {record.height.toFixed(0)} cm
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500 mt-1">
+                          {new Date(record.createdAt).toLocaleDateString()} at {new Date(record.createdAt).toLocaleTimeString()}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-blue-600">
+                          {record.bmi.toFixed(1)}
+                        </div>
+                        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          record.category === 'Normal Weight' 
+                            ? 'bg-green-100 text-green-800'
+                            : record.category === 'Underweight'
+                            ? 'bg-blue-100 text-blue-800'
+                            : record.category === 'Overweight'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {record.category}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {bmiRecords.length > 10 && (
+                    <p className="text-sm text-gray-500 text-center mt-4">
+                      Showing recent 10 records out of {bmiRecords.length} total
+                    </p>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

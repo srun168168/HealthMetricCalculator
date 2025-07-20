@@ -36,10 +36,11 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Database Layer
-- **ORM**: Drizzle ORM configured for PostgreSQL
-- **Schema**: User table with username/password fields defined in shared schema
-- **Storage Interface**: Abstracted storage layer with memory implementation for development
-- **Migrations**: Automatic schema management via drizzle-kit
+- **ORM**: Drizzle ORM configured for PostgreSQL with Neon serverless
+- **Schema**: User and BMI records tables with proper relations defined in shared schema
+- **Storage Interface**: DatabaseStorage implementation replacing MemStorage for production
+- **Migrations**: Automatic schema management via drizzle-kit with `npm run db:push`
+- **BMI Records**: Persistent storage of BMI calculations with user associations
 
 ### Authentication & Users
 - **User Model**: Basic user entity with id, username, and password fields
@@ -49,12 +50,14 @@ Preferred communication style: Simple, everyday language.
 ### Frontend Components
 - **UI Library**: Complete shadcn/ui component set including forms, dialogs, cards, etc.
 - **Form Handling**: React Hook Form with Zod validation resolvers
-- **BMI Calculator**: Main application feature with metric/imperial unit support
+- **BMI Calculator**: Main application feature with metric/imperial unit support, save functionality, and history display
+- **Database Integration**: TanStack Query for API communication with save and history features
 - **Responsive Design**: Mobile-first approach with responsive breakpoints
 
 ### API Layer
-- **REST Architecture**: Express.js routes with /api prefix
-- **Error Handling**: Centralized error handling middleware
+- **REST Architecture**: Express.js routes with /api prefix for BMI record management
+- **BMI Endpoints**: GET /api/bmi-records, POST /api/bmi-records, GET /api/users/:id/bmi-records
+- **Error Handling**: Centralized error handling middleware with Zod validation
 - **Request Logging**: Automatic API request/response logging
 - **Type Safety**: Shared types between client and server
 
@@ -98,6 +101,16 @@ Preferred communication style: Simple, everyday language.
 - **Production**: Static file serving with Express
 
 ### Development vs Production
-- **Development**: Vite dev server with HMR, memory-based storage
-- **Production**: Compiled static assets, PostgreSQL database
-- **Replit Integration**: Special handling for Replit development environment
+- **Development**: Vite dev server with HMR, PostgreSQL database integration
+- **Production**: Compiled static assets, PostgreSQL database with Neon serverless
+- **Replit Integration**: Special handling for Replit development environment with automatic database provisioning
+
+## Recent Changes (January 20, 2025)
+- ✓ Added PostgreSQL database with Drizzle ORM integration
+- ✓ Created BMI records table with proper schema and relations
+- ✓ Replaced MemStorage with DatabaseStorage implementation
+- ✓ Added API endpoints for BMI record management (GET, POST)
+- ✓ Enhanced frontend with save functionality and history display
+- ✓ Integrated TanStack Query for server state management
+- ✓ Fixed display issue with "Obese" category (≥ 30.0)
+- ✓ Added toast notifications for save operations
