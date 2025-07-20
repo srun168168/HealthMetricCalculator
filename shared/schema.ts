@@ -12,6 +12,7 @@ export const users = pgTable("users", {
 export const bmiRecords = pgTable("bmi_records", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id),
+  name: text("name").notNull(),
   age: integer("age").notNull(),
   weight: real("weight").notNull(),
   height: real("height").notNull(), // stored in centimeters

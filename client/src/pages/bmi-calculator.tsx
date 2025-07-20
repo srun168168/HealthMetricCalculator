@@ -13,14 +13,15 @@ import { useToast } from "@/hooks/use-toast";
 import type { BmiRecord, InsertBmiRecord } from "@shared/schema";
 
 const bmiSchema = z.object({
-  age: z.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
-  weight: z.number().min(1, "Weight must be greater than 0").max(1000, "Weight must be less than 1000"),
-  heightCm: z.number().min(30, "Height must be at least 30cm").max(300, "Height must be less than 300cm").optional(),
-  heightFeet: z.number().min(1, "Height must be at least 1 foot").max(9, "Height must be less than 9 feet").optional(),
-  heightInches: z.number().min(0, "Inches must be 0 or more").max(11, "Inches must be less than 12").optional(),
+  name: z.string().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  age: z.coerce.number().min(1, "Age must be at least 1").max(120, "Age must be less than 120"),
+  weight: z.coerce.number().min(1, "Weight must be greater than 0").max(1000, "Weight must be less than 1000"),
+  heightCm: z.coerce.number().min(30, "Height must be at least 30cm").max(300, "Height must be less than 300cm").optional(),
+  heightFeet: z.coerce.number().min(1, "Height must be at least 1 foot").max(9, "Height must be less than 9 feet").optional(),
+  heightInches: z.coerce.number().min(0, "Inches must be 0 or more").max(11, "Inches must be less than 12").optional(),
 }).refine(
   (data) => {
-    return data.heightCm !== undefined || (data.heightFeet !== undefined && data.heightInches !== undefined);
+    return data.heightCm || (data.heightFeet && data.heightInches !== undefined);
   },
   {
     message: "Please enter a valid height",
@@ -80,11 +81,12 @@ export default function BMICalculator() {
   const form = useForm<BMIFormData>({
     resolver: zodResolver(bmiSchema),
     defaultValues: {
-      age: '' as any,
-      weight: '' as any,
-      heightCm: '' as any,
-      heightFeet: '' as any,
-      heightInches: '' as any,
+      name: '',
+      age: '',
+      weight: '',
+      heightCm: '',
+      heightFeet: '',
+      heightInches: '',
     },
   });
 
@@ -169,6 +171,7 @@ export default function BMICalculator() {
     
     const record: InsertBmiRecord = {
       userId: null, // For now, we'll allow anonymous records
+      name: formData.name,
       age: formData.age,
       weight: weightInKg,
       height: heightInCm,
@@ -180,7 +183,14 @@ export default function BMICalculator() {
   };
 
   const resetForm = () => {
-    form.reset();
+    form.reset({
+      name: '',
+      age: '',
+      weight: '',
+      heightCm: '',
+      heightFeet: '',
+      heightInches: '',
+    });
     setResult(null);
     setHeightUnit('metric');
     setWeightUnit('metric');
@@ -189,15 +199,15 @@ export default function BMICalculator() {
   const toggleHeightUnit = (unit: 'metric' | 'imperial') => {
     setHeightUnit(unit);
     // Clear height fields when switching units
-    form.setValue('heightCm', '' as any);
-    form.setValue('heightFeet', '' as any);
-    form.setValue('heightInches', '' as any);
+    form.setValue('heightCm', '');
+    form.setValue('heightFeet', '');
+    form.setValue('heightInches', '');
   };
 
   const toggleWeightUnit = (unit: 'metric' | 'imperial') => {
     setWeightUnit(unit);
     // Clear weight field when switching units
-    form.setValue('weight', '' as any);
+    form.setValue('weight', '');
   };
 
   return (
@@ -217,6 +227,25 @@ export default function BMICalculator() {
           <CardContent className="p-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Name Input */}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-semibold text-gray-700">Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Enter your name"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Age Input */}
                 <FormField
                   control={form.control}
@@ -231,7 +260,6 @@ export default function BMICalculator() {
                             placeholder="Enter your age"
                             className="pr-16"
                             {...field}
-                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                           />
                         </FormControl>
                         <span className="absolute right-4 top-3 text-gray-400 text-sm">years</span>
@@ -286,7 +314,6 @@ export default function BMICalculator() {
                                 placeholder="Enter height in centimeters"
                                 className="pr-12"
                                 {...field}
-                                onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                               />
                             </FormControl>
                             <span className="absolute right-4 top-3 text-gray-400 text-sm">cm</span>
@@ -312,7 +339,6 @@ export default function BMICalculator() {
                                   placeholder="Feet"
                                   className="pr-10"
                                   {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <span className="absolute right-4 top-3 text-gray-400 text-sm">ft</span>
@@ -333,7 +359,6 @@ export default function BMICalculator() {
                                   placeholder="Inches"
                                   className="pr-10"
                                   {...field}
-                                  onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                                 />
                               </FormControl>
                               <span className="absolute right-4 top-3 text-gray-400 text-sm">in</span>
@@ -389,7 +414,6 @@ export default function BMICalculator() {
                               placeholder="Enter your weight"
                               className="pr-12"
                               {...field}
-                              onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
                             />
                           </FormControl>
                           <span className="absolute right-4 top-3 text-gray-400 text-sm">
@@ -529,6 +553,9 @@ export default function BMICalculator() {
                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border"
                     >
                       <div className="flex-1">
+                        <div className="font-medium text-gray-900 mb-1">
+                          {record.name}
+                        </div>
                         <div className="flex items-center gap-4">
                           <div className="text-sm text-gray-600">
                             Age: {record.age}
