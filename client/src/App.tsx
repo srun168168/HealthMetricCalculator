@@ -4,13 +4,17 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/contexts/theme-context";
-import BMICalculator from "@/pages/bmi-calculator";
+import Home from "@/pages/home";
+import Cart from "@/pages/cart";
+import ProductDetail from "@/pages/product-detail";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={BMICalculator} />
+      <Route path="/" component={Home} />
+      <Route path="/cart" component={Cart} />
+      <Route path="/product/:id" component={ProductDetail} />
       <Route component={NotFound} />
     </Switch>
   );
